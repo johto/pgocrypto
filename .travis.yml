@@ -36,3 +36,4 @@ before_script:
  - psql -c 'create database pgocryptotest' -U postgres
  - psql -c 'create extension pgcrypto' -U postgres -d pgocryptotest
  - psql -c 'create extension pgocrypto' -U postgres -d pgocryptotest
+ - go get github.com/lib/pq
