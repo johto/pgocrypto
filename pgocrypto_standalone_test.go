@@ -141,6 +141,6 @@ For I must now to Oberon.`
 		t.Fatal(err)
 	}
 	if decrypted != input {
-		t.Fatal("%v != %v", input, decrypted)
+		t.Fatalf("%v != %v", input, decrypted)
 	}
 }
