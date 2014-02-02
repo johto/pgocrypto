@@ -12,3 +12,5 @@ Go side.
 This extension should be installed into the same schema with pgcrypto.
 
 Requires PostgreSQL 9.1 or later.
+
+[![Build Status](https://travis-ci.org/johto/pgocrypto.png?branch=master)](https://travis-ci.org/johto/pgocrypto)
