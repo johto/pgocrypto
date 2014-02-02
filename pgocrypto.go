@@ -19,56 +19,55 @@ import (
 // very simple PKCS padding, as implemented in pgcrypto
 func pkcsPad(input []byte, blockSize int) []byte {
 	padLen := blockSize - (len(input) % blockSize)
-    padded := make([]byte, len(input) + padLen)
+	padded := make([]byte, len(input)+padLen)
 	copy(padded, input)
 
 	padding := padded[len(input):]
 	for i, _ := range padding {
 		padding[i] = byte(padLen)
 	}
-
-    return padded
+	return padded
 }
 
 // .. and the reverse operation
 func pkcsUnpad(input []byte, blockSize int) ([]byte, error) {
-	if len(input) % blockSize != 0 {
+	if len(input)%blockSize != 0 {
 		return nil, fmt.Errorf("input length %d not divisible by block size %d", len(input), blockSize)
 	}
 	if len(input) < blockSize {
 		return nil, fmt.Errorf("input length %d is smaller than block size %d", len(input), blockSize)
 	}
-	padLen := int(input[len(input) - 1])
+	padLen := int(input[len(input)-1])
 	if padLen <= 0 || padLen > blockSize {
 		return nil, fmt.Errorf("invalid padding length %d", padLen)
 	}
-	for pos, byte := range input[len(input) - padLen:] {
+	for pos, byte := range input[len(input)-padLen:] {
 		if int(byte) != padLen {
 			return nil, fmt.Errorf("padding byte %d at pos %d is not the same as padding length %d", byte, pos, padLen)
 		}
 	}
-	return input[:len(input) - padLen], nil
+	return input[:len(input)-padLen], nil
 }
 
 // Encrypts a slice of bytes using secretKey.
 func Encrypt(plaintext []byte, secretKey []byte) ([]byte, error) {
-    aes, err := aes.NewCipher(secretKey)
-    if err != nil {
+	aes, err := aes.NewCipher(secretKey)
+	if err != nil {
 		return nil, err
-    }
+	}
 
-    iv := make([]byte, aes.BlockSize())
+	iv := make([]byte, aes.BlockSize())
 	_, err = io.ReadFull(rand.Reader, iv)
 	if err != nil {
 		return nil, err
 	}
 
-    cbc := cipher.NewCBCEncrypter(aes, iv)
-    padded := pkcsPad(plaintext, aes.BlockSize())
+	cbc := cipher.NewCBCEncrypter(aes, iv)
+	padded := pkcsPad(plaintext, aes.BlockSize())
 	// put the IV at the beginning of the ciphertext
-    encrypted := make([]byte, len(iv) + len(padded))
+	encrypted := make([]byte, len(iv)+len(padded))
 	copy(encrypted[:len(iv)], iv)
-    cbc.CryptBlocks(encrypted[len(iv):], padded)
+	cbc.CryptBlocks(encrypted[len(iv):], padded)
 
 	return encrypted, nil
 }
@@ -86,10 +85,10 @@ func EncryptString(plaintext string, secretKey []byte) (string, error) {
 
 // Decrypts a byte slice using secretKey.
 func Decrypt(ciphertext []byte, secretKey []byte) ([]byte, error) {
-    aes, err := aes.NewCipher(secretKey)
-    if err != nil {
+	aes, err := aes.NewCipher(secretKey)
+	if err != nil {
 		return nil, err
-    }
+	}
 
 	if (len(ciphertext) % aes.BlockSize()) > 0 {
 		return nil, fmt.Errorf("input length %d is not a multiple of blocksize %d", len(ciphertext), aes.BlockSize())
